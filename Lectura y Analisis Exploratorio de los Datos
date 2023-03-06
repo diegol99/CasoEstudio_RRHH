@@ -30,7 +30,8 @@ df2= pd.merge(df_generaldt,df_employee,on="employeeid",how="inner")
 df_final = pd.merge(df2,df_managers,on="employeeid",how="inner")
 df_retir = pd.merge(df_final,df_retire,on="employeeid",how="right")
 
-##Analisis Exploratorio
+####### Análisis Exploratorio ##########
+
 variables1 = df_final[["department","educationfield","gender"]]
 for i in variables1:
     plt.figure(figsize= (12,9))
@@ -161,5 +162,113 @@ fig.show()
 # Tabla de contingencia años dedsde la ultima promocion / capacitaciones
 pd.crosstab(index=df_retir["yearssincelastpromotion"],
             columns=df_retir['trainingtimeslastyear'], margins=True)
- 
+            
+ #######  Análisis Exploratorio: Df Retirados #########
+
+
+1.   Revisar tiempo de capacitación. Esto puede afectar el rendimiento de los que se han retirado
+2.   Buscar si las tareas asignadas al principio de la contratación son las mismas a la hora del retiro. Al poner trabajos adicionales, en diferente área y sin remuneración puede afectar.
+3. Verificar los datos duplicados, atipicos.
+4. Las personas que están asignando a los problemas,no tienen que ver con educación o area encargad
+
+
+
+#dataset con solo los que se han retirado. Información completa
+##Edad común de retiro ?
+## Nivel de participación Jobinvolment
+## Salario justificable? 
+df_retir = pd.merge(df_final,df_retire,on="employeeid",how="right")
+df_retir.columns = map(str.lower,df_retir.columns)
+
+df_retir
+
+df_retir.describe()
+
+##Verificar esa clasificación de otras. Especificar que puede ser
+df_retir["resignationreason"].value_counts()
+
+**¿Las edad de los empleados influye en su retiro?**
+
+pd.crosstab(index=df_retir['age'],
+            columns=df_retir['retirementtype']).plot(kind='bar',stacked = True, rot=0, figsize=(15, 10))
+
+
+##Mayor cantidad de personas están de acuerdo(365)--->> Muy a la par de las que no(341)
+df_retir["environmentsatisfaction"].value_counts()
+
+df_retir["numcompaniesworked"].value_counts()
+
+##df con nulos
+dfcon = df_retir.copy()
+dfcon
+
+## Distribución de la variable resignationreason, la cual, es la que contiene más datos nulos
+def distribucion_variable_categorica(col):
+    df_retir[col].value_counts(ascending=True,normalize=True).tail(20).plot.hist()
+    plt.show()
+distribucion_variable_categorica('resignationreason')
+
+## Distribución de la variable resignationreason sin nulos
+dfsin = df_retir.dropna()
+def distribucion_variable_categorica1(col):
+    dfsin[col].value_counts(normalize=True).tail(20).plot.hist()
+    plt.show()
+distribucion_variable_categorica1("resignationreason")
+
+##No viajan mucho las personas que se retiraron
+## El departamento de research & developmen es donde más se retiran, segundo ventas.
+##Las personas que estudiaron ciencias de la vida y medicina son las que más se retiran
+## se retiran más los hombres que las mujeres
+##las personas abandonan el puesto m resignación
+variables = dfcon[["department","educationfield","gender"]]
+for i in variables:
+    plt.figure(figsize= (12,9))
+    sns.countplot(x= variables[i])
+
+**¿Qué tanto estuvieron involucrados las personas retiradas en proyectos según sus estudios?**
+
+pd.crosstab(index=df_retir['educationfield'],
+            columns=df_retir['jobinvolvement']).plot(kind='bar') 
+
+**¿Qué tan satisfechos estan los empleados por departamento?**
+
+## Cantidad de personas segun su departamento y qué satisfechos están.
+pd.crosstab(index=df_retir['department'],
+            columns=df_retir['jobsatisfaction']).plot(kind='bar') 
+
+## De los retirados de los diferentes departamentos, se realizaron de 2 a 3 capacitaciones
+plt.figure(figsize = (14,9))
+sns.countplot(data=df_retir,x="department",hue="trainingtimeslastyear")
+
+## Porcentaje de empleados por departament
+basepie= df_retir.groupby(["department"])[["employeecount"]].count().sort_values('employeecount', ascending = False).reset_index()
+empl1 = df_retir["employeecount"].sum()
+
+fig = px.pie(basepie, values = 'employeecount',names="department",hole= .5,
+                color_discrete_sequence=px.colors.qualitative.G10)
+
+fig.update_layout(
+    template = 'simple_white',
+    title_x = 0.5,
+    annotations = [dict(text = str(empl1), x=0.5, y = 0.5, font_size = 40, showarrow = False )])
+fig.show()
+
+df_retir.columns
+
+df_retir['retirementdate'] = pd.to_datetime(df_retir['retirementdate']) # Convertir la fecha en el formato correcto
+df_retir["retirementdate"] = df_retir["retirementdate"].dt.month
+retfecha= df_retir.groupby(["retirementdate"])[["employeecount"]].count().reset_index()
+fig = px.line(retfecha, x='retirementdate', y =['employeecount'], title = '<b>Evolución de retiros de los empleados<b>',
+              color_discrete_sequence=px.colors.qualitative.G10)
+fig.update_layout(
+    template = 'simple_white',
+    title_x = 0.5,
+    legend_title = 'Despidos:',
+    xaxis_title = '<b>Fecha<b>',
+    yaxis_title = '<b>Cantidad de casos<b>',
+)
+
+fig.show()
+
+retfecha
 
