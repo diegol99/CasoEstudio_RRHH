@@ -31,3 +31,135 @@ df_final = pd.merge(df2,df_managers,on="employeeid",how="inner")
 df_retir = pd.merge(df_final,df_retire,on="employeeid",how="right")
 
 ##Analisis Exploratorio
+variables1 = df_final[["department","educationfield","gender"]]
+for i in variables1:
+    plt.figure(figsize= (12,9))
+    sns.countplot(x= variables1[i])
+ ##Análisis exploratorio
+
+variables1 = df_final[["department","educationfield","gender"]]
+for i in variables1:
+    plt.figure(figsize= (12,9))
+    sns.countplot(x= variables1[i])
+
+##Información especifica 
+##Departamento de recursos humanos es muy pequeño a comparación de los otros
+import plotly.express as px
+basepie= df_final.groupby(["department"])[["employeecount"]].count().sort_values('employeecount', ascending = False).reset_index()
+empl = df_final["employeecount"].sum()
+
+fig = px.pie(basepie, values = 'employeecount',names="department",hole= .5,
+                color_discrete_sequence=px.colors.qualitative.G10)
+
+fig.update_layout(
+    template = 'simple_white',
+    title_x = 0.5,
+    annotations = [dict(text = str(empl), x=0.5, y = 0.5, font_size = 40, showarrow = False )])
+fig.show()
+
+##Número de capacitaciones de los empleados que se encuentran en la empresa ----> df_final
+plt.figure(figsize = (14,9))
+sns.countplot(data=df_final,x="department",hue="trainingtimeslastyear")
+
+##Número de capacitaciones de los empleados que se encuentran en la empresa ----> df_retirados
+plt.figure(figsize = (14,9))
+sns.countplot(data=df_retir,x="department",hue="trainingtimeslastyear")
+
+## Numero de capacitaciones de acuerdo a su satisfacción  df---->retirados
+# Tabla de contingencia jobsatisfacion / capacitaciones
+pd.crosstab(index=df_retir["jobsatisfaction"],
+            columns=df_retir['trainingtimeslastyear'], margins=True)
+
+**¿Cuál es el departamento con más empleados retirados según su nivel de trabajo?**
+
+##Boxplot de las razones de retiro por departamento---> df retirados
+fig = px.box(df_retir, x="resignationreason" , y='jobsatisfaction', color="department")
+fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
+fig.show()
+
+**¿La edad de los empleados influye en los ascensos?**
+
+# Tabla de contingencia aumento o promocion /edad
+pd.crosstab(index=df_final["age"],
+            columns=df_final["yearssincelastpromotion"], margins=True)
+
+# Tabla de contingencia años en la compañia / promocion
+pd.crosstab(index=df_retir["yearssincelastpromotion"],
+            columns=df_retir['yearsatcompany'], margins=True)
+
+**¿Existe igualdad entre los salarios de hombres y mujeres?**
+
+import plotly.express as px
+df = df_final
+fig = px.histogram(df, x="monthlyincome", color="gender")
+fig.show()
+
+###grafico años para ascendero ser jefe vs salario mensual
+import plotly.express as px
+df = df_final
+fig = px.histogram(df, x="monthlyincome", color="yearswithcurrmanager")
+fig.show()
+
+#boxplot influencia de lo que ganan mensualmente vs su razón de salida por genero
+fig = px.box(df_retir, x="resignationreason" , y='monthlyincome', color="gender")
+fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
+fig.show()
+
+**¿El número de capacitaciones en el último año influye en el salario mensual?**
+
+#histohgrama relacion de salario mensual vs el numero de capacitaciones al año
+df = df_final
+fig = px.histogram(df, x="monthlyincome", color="trainingtimeslastyear")
+fig.show()
+
+# Tabla de contingencia departamento / capacitaciones ---> Df retirados
+pd.crosstab(index=df_retir["department"],
+            columns=df_retir['trainingtimeslastyear'], margins=True)
+
+**¿Cuáles son los motivos por los que se retiraron los empleados de la empresa? ¿Esto tiene alguna relación con el número de capacitaciones que recibieron recientemente?**
+
+# Tabla de contingencia Resignacion / capacitaciones
+pd.crosstab(index=df_retir["resignationreason"],
+            columns=df_retir['trainingtimeslastyear'], margins=True)
+
+# Tabla de contingencia departamento/Eduacionfield ---> df_retirados
+pd.crosstab(index=df_retir["department"],
+            columns=df_retir["educationfield"], margins=True)
+
+# Tabla de contingencia departamento/Eduacionfield ---> df_final
+pd.crosstab(index=df_final["department"],
+            columns=df_final["educationfield"], margins=True)
+
+#Estudios de las personas y qué tanto están involucradas en el trabajo.
+pd.crosstab(index=df_final['educationfield'],
+            columns=df_final['jobinvolvement']).plot(kind='bar') 
+
+####boxplot relacion de lo que ganan mensualmente vs su motivo de retiro por nivel de trabajo
+fig = px.box(df_retir, x="resignationreason" , y='monthlyincome', color="joblevel")
+fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
+fig.show()
+
+**¿Existe alguna relación entre el nivel de trabajo y el nivel de satisfacción?**
+
+# Tabla de contingencia Nivel de trabajo/nivel de satisfación <----Df final
+pd.crosstab(index=df_final["joblevel"],
+            columns=df_final["jobsatisfaction"], margins=True)
+
+**¿Cuál es el nivel de satisfacción en cada área?**
+
+# Tabla de contingencia education field/nivel de satisfacion <----df final 
+pd.crosstab(index=df_final["educationfield"],
+            columns=df_final["jobsatisfaction"], margins=True)
+
+##Boxplo departamento vs nivel de satisfacion por genro df final
+fig = px.box(df_final, x='department' , y="jobsatisfaction", color="gender")
+fig.update_traces(quartilemethod="exclusive") # or "inclusive", or "linear" by default
+fig.show()
+
+**¿Las capacitaciones influyen en que los trabajadores asciendan de cargo?**
+
+# Tabla de contingencia años dedsde la ultima promocion / capacitaciones
+pd.crosstab(index=df_retir["yearssincelastpromotion"],
+            columns=df_retir['trainingtimeslastyear'], margins=True)
+ 
+
