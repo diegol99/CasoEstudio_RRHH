@@ -12,3 +12,8 @@ Los costos que implica la rotación varían mucho dependiendo de la persona y el
 
 Con base en la información anterior, se solicita al equipo de analítica proponer estrategias que permitan tomar acciones para reducir el porcentaje de retiros utilizando la información disponible que se tiene de los empleados. La información fue extraída con corte 31 de diciembre de 2015, con excepción de la información de retiro retirement_info.csv que se registró con corte a 31 de diciembre de 2016 para saber los retiros durante ese año.
 
+De acuerdo a esto, los notebooks se dividen de la siguiente manera:
+
+Avance 1: Carga y analisis exploratorio de los datos
+Avance 2: Transformación de los datos y selección de variables
+Avance 3: Modelos y predicciones.
