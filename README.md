@@ -14,6 +14,6 @@ Con base en la información anterior, se solicita al equipo de analítica propon
 
 De acuerdo a esto, los notebooks se dividen de la siguiente manera:
 
-Avance 1: Carga y analisis exploratorio de los datos
-Avance 2: Transformación de los datos y selección de variables
-Avance 3: Modelos y predicciones.
+##Avance 1: Carga y analisis exploratorio de los datos
+##Avance 2: Transformación de los datos y selección de variables
+##Avance 3: Modelos y predicciones.
